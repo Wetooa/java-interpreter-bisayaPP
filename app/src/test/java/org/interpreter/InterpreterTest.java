@@ -1,4 +1,4 @@
-package org;
+package org.interpreter;
 
 import java.lang.String;
 import java.nio.charset.StandardCharsets;
@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
+import org.utils.Testcase;
 
 public class InterpreterTest {
   static final int NUMBER_OF_TEST_CASES = 1;
