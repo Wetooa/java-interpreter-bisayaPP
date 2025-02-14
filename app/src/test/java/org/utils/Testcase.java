@@ -1,4 +1,4 @@
-package org;
+package org.utils;
 
 public class Testcase {
   int number;
