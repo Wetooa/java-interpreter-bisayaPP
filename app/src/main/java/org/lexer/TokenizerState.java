@@ -69,6 +69,8 @@ public class TokenizerState {
           return new TokenizerState(StateType.OPEN_PARENTHESIS_END);
         } else if (c == ')') {
           return new TokenizerState(StateType.CLOSE_PARENTHESIS_END);
+        } else if (c == ' ') {
+          return new TokenizerState(StateType.START);
         } else {
           throw new UnknownCharacterException();
         }
@@ -77,7 +79,7 @@ public class TokenizerState {
         if (c == '-') {
           return new TokenizerState(StateType.COMMENT_CONTENT);
         } else {
-          return new TokenizerState(StateType.COMMENT);
+          return new TokenizerState(StateType.ARITHMETIC_OPERATOR_END);
         }
 
       case COMMENT_CONTENT:
