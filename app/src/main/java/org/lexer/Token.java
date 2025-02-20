@@ -2,8 +2,48 @@ package org.lexer;
 
 class Token {
 
-  public enum TokenType {
-    KEYWORD,
+  public static enum TokenType {
+    START_BLOCK,
+    END_BLOCK,
+    CONDITIONAL_BLOCK,
+
+    VARIABLE_DECLARATION,
+
+    INPUT_STATEMENTS,
+    OUTPUT_STATEMENTS,
+
+    FOR_LOOP,
+
+    IDENTIFIER,
+
+    EQUALS,
+    OPEN_PARENTHESIS,
+    CLOSE_PARENTHESIS,
+
+    NUMBER,
+    OPERATOR,
+
+    SYMBOL,
+
+    STRING,
+
+    DATATYPE
+  }
+
+  private final TokenType type;
+  private final String value;
+
+  public Token(TokenType type, String value) {
+    this.type = type;
+    this.value = value;
+  }
+
+  public TokenType getType() {
+    return type;
+  }
+
+  public String getValue() {
+    return value;
   }
 
 }
