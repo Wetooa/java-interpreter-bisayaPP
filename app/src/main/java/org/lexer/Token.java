@@ -21,7 +21,12 @@ class Token {
     CLOSE_PARENTHESIS,
 
     NUMBER,
-    OPERATOR,
+
+    LOGICAL_OPERATOR,
+    ARITHMETIC_OPERATOR,
+    ASSIGNMENT_OPERATOR,
+
+    BOOLEAN_VALUE,
 
     SYMBOL,
 
@@ -44,6 +49,11 @@ class Token {
 
   public String getValue() {
     return value;
+  }
+
+  @Override
+  public String toString() {
+    return "Token [type=" + type + ", value=" + value + "]";
   }
 
 }

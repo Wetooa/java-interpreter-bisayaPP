@@ -21,8 +21,13 @@ public class Lexer {
       put("DAWAT", TokenType.INPUT_STATEMENTS);
       put("IPAKITA", TokenType.OUTPUT_STATEMENTS);
 
-      put("ALANG", TokenType.FOR_LOOP);
-      put("SA", TokenType.FOR_LOOP);
+      put("UG", TokenType.LOGICAL_OPERATOR);
+      put("O", TokenType.LOGICAL_OPERATOR);
+      put("DILI", TokenType.LOGICAL_OPERATOR);
+
+      put("OO", TokenType.BOOLEAN_VALUE);
+
+      put("ALANG SA", TokenType.FOR_LOOP);
 
       put("NUMERO", TokenType.DATATYPE);
       put("LETRA", TokenType.DATATYPE);
@@ -31,6 +36,13 @@ public class Lexer {
     }
   };
 
+  private void addToken(List<Token> tokens, TokenType type, StringBuilder value) {
+    String tokenValue = value.toString().trim();
+
+    tokens.add(new Token(type, tokenValue));
+    value.setLength(0);
+  }
+
   public List<Token> tokenize(String input) {
     input = new StringBuilder(input).append("\n").toString();
 
@@ -38,8 +50,12 @@ public class Lexer {
     StringBuilder value = new StringBuilder();
     TokenizerState state = new TokenizerState(StateType.START);
 
-    for (char c : input.toCharArray()) {
+    for (int i = 0; i < input.length();) {
+      char c = input.charAt(i);
       value.append(c);
+
+      System.out.println(c);
+      System.out.println(state);
 
       // FIX: Handle better later
       try {
@@ -48,9 +64,32 @@ public class Lexer {
         e.printStackTrace();
       }
 
-      if (state.getType() == StateType.DIGIT_END) {
-        tokens.add(new Token(TokenType.NUMBER, value.toString()));
-        value = new StringBuilder();
+      switch (state.getType()) {
+        case ARITHMETIC_OPERATOR_END:
+          addToken(tokens, TokenType.ARITHMETIC_OPERATOR, value);
+          break;
+
+        case OPEN_PARENTHESIS_END:
+          addToken(tokens, TokenType.OPEN_PARENTHESIS, value);
+
+        case CLOSE_PARENTHESIS_END:
+          addToken(tokens, TokenType.CLOSE_PARENTHESIS, value);
+
+        case DIGIT_END:
+          addToken(tokens, TokenType.NUMBER, value);
+          break;
+
+        case ALPHABETIC_END:
+          if (KEYWORDS.containsKey(value.toString().trim())) {
+            addToken(tokens, KEYWORDS.get(value.toString().trim()), value);
+          } else {
+            addToken(tokens, TokenType.IDENTIFIER, value);
+          }
+          break;
+
+        default:
+          ++i;
+          break;
       }
     }
 
