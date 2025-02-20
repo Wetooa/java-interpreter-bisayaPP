@@ -36,59 +36,71 @@ public class Lexer {
     }
   };
 
-  private void addToken(List<Token> tokens, TokenType type, StringBuilder value) {
+  private TokenizerState state;
+  private StringBuilder value;
+  private List<Token> tokens;
+
+  private void addToken(TokenType type) {
     String tokenValue = value.toString().trim();
 
-    tokens.add(new Token(type, tokenValue));
-    value.setLength(0);
+    this.tokens.add(new Token(type, tokenValue));
+    this.value.setLength(0);
+
+    // FIX: Handle better later
+    try {
+      this.state = TokenizerState.transition(this.state, ' ');
+    } catch (LexerException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private String inputCleaning(String input) {
+    return new StringBuilder(input).append("\n").toString();
   }
 
   public List<Token> tokenize(String input) {
-    input = new StringBuilder(input).append("\n").toString();
+    input = inputCleaning(input);
 
-    ArrayList<Token> tokens = new ArrayList<>();
-    StringBuilder value = new StringBuilder();
-    TokenizerState state = new TokenizerState(StateType.START);
+    this.tokens = new ArrayList<>();
+    this.value = new StringBuilder();
+    this.state = new TokenizerState(StateType.START);
 
-    for (int i = 0; i < input.length();) {
-      char c = input.charAt(i);
-      value.append(c);
-
-      System.out.println(c);
-      System.out.println(state);
+    for (char c : input.toCharArray()) {
+      this.value.append(c);
 
       // FIX: Handle better later
       try {
-        state = TokenizerState.transition(state, c);
+        this.state = TokenizerState.transition(this.state, c);
       } catch (LexerException e) {
         e.printStackTrace();
       }
 
       switch (state.getType()) {
         case ARITHMETIC_OPERATOR_END:
-          addToken(tokens, TokenType.ARITHMETIC_OPERATOR, value);
+          addToken(TokenType.ARITHMETIC_OPERATOR);
           break;
 
         case OPEN_PARENTHESIS_END:
-          addToken(tokens, TokenType.OPEN_PARENTHESIS, value);
+          addToken(TokenType.OPEN_PARENTHESIS);
 
         case CLOSE_PARENTHESIS_END:
-          addToken(tokens, TokenType.CLOSE_PARENTHESIS, value);
+          addToken(TokenType.CLOSE_PARENTHESIS);
 
         case DIGIT_END:
-          addToken(tokens, TokenType.NUMBER, value);
+          addToken(TokenType.NUMBER);
           break;
 
         case ALPHABETIC_END:
-          if (KEYWORDS.containsKey(value.toString().trim())) {
-            addToken(tokens, KEYWORDS.get(value.toString().trim()), value);
+          String identifierValue = value.toString().trim();
+
+          if (KEYWORDS.containsKey(identifierValue)) {
+            addToken(KEYWORDS.get(identifierValue));
           } else {
-            addToken(tokens, TokenType.IDENTIFIER, value);
+            addToken(TokenType.IDENTIFIER);
           }
           break;
 
         default:
-          ++i;
           break;
       }
     }
