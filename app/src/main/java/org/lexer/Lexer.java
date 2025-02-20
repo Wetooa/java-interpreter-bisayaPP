@@ -15,6 +15,7 @@ public class Lexer {
     {
       put("SUGOD", TokenType.START_BLOCK);
       put("KATAPUSAN", TokenType.END_BLOCK);
+      put("KUNG", TokenType.CONDITIONAL_BLOCK);
 
       put("MUGNA", TokenType.VARIABLE_DECLARATION);
 
@@ -36,24 +37,6 @@ public class Lexer {
     }
   };
 
-  private TokenizerState state;
-  private StringBuilder value;
-  private List<Token> tokens;
-
-  private void addToken(TokenType type) {
-    String tokenValue = value.toString().trim();
-
-    this.tokens.add(new Token(type, tokenValue));
-    this.value.setLength(0);
-
-    // FIX: Handle better later
-    try {
-      this.state = TokenizerState.transition(this.state, ' ');
-    } catch (LexerException e) {
-      e.printStackTrace();
-    }
-  }
-
   private String inputCleaning(String input) {
     return new StringBuilder(input).append("\n").toString();
   }
@@ -61,47 +44,56 @@ public class Lexer {
   public List<Token> tokenize(String input) {
     input = inputCleaning(input);
 
-    this.tokens = new ArrayList<>();
-    this.value = new StringBuilder();
-    this.state = new TokenizerState(StateType.START);
+    List<Token> tokens = new ArrayList<>();
+    TokenizerState state = new TokenizerState(StateType.START);
+    StringBuilder value = new StringBuilder();
 
-    for (char c : input.toCharArray()) {
-      this.value.append(c);
+    int i = 0;
 
-      // FIX: Handle better later
+    while (i < input.length()) {
+      char c = input.charAt(i);
+
       try {
-        this.state = TokenizerState.transition(this.state, c);
+        state = TokenizerState.transition(state, c);
       } catch (LexerException e) {
+        // TODO: Auto-generated catch block
         e.printStackTrace();
       }
 
-      switch (state.getType()) {
-        case ARITHMETIC_OPERATOR_END:
-          addToken(TokenType.ARITHMETIC_OPERATOR);
-          break;
+      if (state.isEndState()) {
+        String tokenValue = value.toString().trim();
 
-        case OPEN_PARENTHESIS_END:
-          addToken(TokenType.OPEN_PARENTHESIS);
+        switch (state.getType()) {
+          case ARITHMETIC_OPERATOR_END:
+            tokens.add(new Token(TokenType.ARITHMETIC_OPERATOR, tokenValue));
+            break;
+          case OPEN_PARENTHESIS_END:
+            tokens.add(new Token(TokenType.OPEN_PARENTHESIS, tokenValue));
+            break;
+          case CLOSE_PARENTHESIS_END:
+            tokens.add(new Token(TokenType.CLOSE_PARENTHESIS, tokenValue));
+            break;
+          case DIGIT_END:
+            tokens.add(new Token(TokenType.NUMBER, tokenValue));
+            break;
+          case SYMBOL_END:
+            tokens.add(new Token(TokenType.SYMBOL, tokenValue));
+            break;
+          case ALPHABETIC_END:
+            if (KEYWORDS.containsKey(tokenValue)) {
+              tokens.add(new Token(KEYWORDS.get(tokenValue), tokenValue));
+            } else {
+              tokens.add(new Token(TokenType.IDENTIFIER, tokenValue));
+            }
+            break;
+          default:
+            System.out.println("Unhandled Tokenizer End State: " + state.getType());
+        }
 
-        case CLOSE_PARENTHESIS_END:
-          addToken(TokenType.CLOSE_PARENTHESIS);
-
-        case DIGIT_END:
-          addToken(TokenType.NUMBER);
-          break;
-
-        case ALPHABETIC_END:
-          String identifierValue = value.toString().trim();
-
-          if (KEYWORDS.containsKey(identifierValue)) {
-            addToken(KEYWORDS.get(identifierValue));
-          } else {
-            addToken(TokenType.IDENTIFIER);
-          }
-          break;
-
-        default:
-          break;
+        value = new StringBuilder();
+      } else {
+        value.append(c);
+        i++;
       }
     }
 
