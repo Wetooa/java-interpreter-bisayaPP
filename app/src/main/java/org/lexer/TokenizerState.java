@@ -22,6 +22,8 @@ public class TokenizerState {
     OPEN_PARENTHESIS_END,
     CLOSE_PARENTHESIS_END,
 
+    SYMBOL_END,
+
     ALPHABETIC,
     ALPHABETIC_END,
 
@@ -30,8 +32,6 @@ public class TokenizerState {
     DIGIT_DECIMAL,
     DIGIT_END,
   }
-
-  public static final List<Character> SKIPPABLE_SYMBOLS = List.of(' ', '\n', '\t');
 
   private final StateType type;
 
@@ -43,8 +43,16 @@ public class TokenizerState {
     this.type = type;
   }
 
+  private static final List<Character> SKIPPABLE_SYMBOLS = List.of(' ', '\n', '\t');
+
   private static boolean isSkippable(char c) {
     return SKIPPABLE_SYMBOLS.contains(c);
+  }
+
+  public boolean isEndState() {
+    return this.type == StateType.ARITHMETIC_OPERATOR_END || this.type == StateType.OPEN_PARENTHESIS_END
+        || this.type == StateType.CLOSE_PARENTHESIS_END || this.type == StateType.DIGIT_END
+        || this.type == StateType.ALPHABETIC_END || this.type == StateType.COMMENT_END;
   }
 
   public static TokenizerState transition(TokenizerState state, char c) throws LexerException {
@@ -71,6 +79,8 @@ public class TokenizerState {
           return new TokenizerState(StateType.CLOSE_PARENTHESIS_END);
         } else if (c == ' ') {
           return new TokenizerState(StateType.START);
+        } else if (c == ',') {
+          return new TokenizerState(StateType.SYMBOL_END);
         } else {
           throw new UnknownCharacterException();
         }
@@ -109,6 +119,9 @@ public class TokenizerState {
       case ARITHMETIC_OPERATOR_END:
         return new TokenizerState(StateType.START);
 
+      case SYMBOL_END:
+        return new TokenizerState(StateType.START);
+
       case DIGIT_WHOLE:
 
         if (Character.isDigit(c)) {
@@ -125,7 +138,7 @@ public class TokenizerState {
       case ALPHABETIC:
         if (Character.isAlphabetic(c) || Character.isDigit(c) || c == '_') {
           return new TokenizerState(StateType.ALPHABETIC);
-        } else if (isSkippable(c)) {
+        } else if (isSkippable(c) || c == ',') {
           return new TokenizerState(StateType.ALPHABETIC_END);
         } else {
           throw new UnknownCharacterException();
