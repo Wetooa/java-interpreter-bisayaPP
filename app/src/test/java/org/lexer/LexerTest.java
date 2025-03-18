@@ -13,7 +13,7 @@ public class LexerTest {
   public void testTokenize() {
 
     Lexer lexer = new Lexer();
-    List<Token> tokens = lexer.tokenize("123 MUGNA <= <> > 23\n what_ever NUMERO OO O");
+    List<Token> tokens = lexer.tokenize("123 MUGNA <= <> > 23\n what_ever NUMERO OO O O x, y, z, abc");
 
     System.out.println(tokens);
 

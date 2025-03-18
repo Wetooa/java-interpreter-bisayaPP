@@ -1,41 +1,13 @@
 package org.lexer;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.exception.LexerException;
 import org.lexer.Token.TokenType;
 import org.lexer.TokenizerState.StateType;
 
 public class Lexer {
-
-  public static final Map<String, TokenType> KEYWORDS = new HashMap<>() {
-    {
-      put("SUGOD", TokenType.START_BLOCK);
-      put("KATAPUSAN", TokenType.END_BLOCK);
-      put("KUNG", TokenType.CONDITIONAL_BLOCK);
-
-      put("MUGNA", TokenType.VARIABLE_DECLARATION);
-
-      put("DAWAT", TokenType.INPUT_STATEMENTS);
-      put("IPAKITA", TokenType.OUTPUT_STATEMENTS);
-
-      put("UG", TokenType.LOGICAL_OPERATOR);
-      put("O", TokenType.LOGICAL_OPERATOR);
-      put("DILI", TokenType.LOGICAL_OPERATOR);
-
-      put("OO", TokenType.BOOLEAN_VALUE);
-
-      put("ALANG SA", TokenType.FOR_LOOP);
-
-      put("NUMERO", TokenType.DATATYPE);
-      put("LETRA", TokenType.DATATYPE);
-      put("TINUOD", TokenType.DATATYPE);
-      put("TIPIK", TokenType.DATATYPE);
-    }
-  };
 
   private String inputCleaning(String input) {
     return new StringBuilder(input).append("\n").toString();
@@ -60,10 +32,15 @@ public class Lexer {
         e.printStackTrace();
       }
 
+      System.out.println(c + " " + state);
+
       if (state.isEndState()) {
         String tokenValue = value.toString().trim();
 
         switch (state.getType()) {
+          case COMMENT_END:
+            System.out.println("Encountered a comment: " + tokenValue);
+            break;
           case ARITHMETIC_OPERATOR_END:
             tokens.add(new Token(TokenType.ARITHMETIC_OPERATOR, tokenValue));
             break;
@@ -80,8 +57,8 @@ public class Lexer {
             tokens.add(new Token(TokenType.SYMBOL, tokenValue));
             break;
           case ALPHABETIC_END:
-            if (KEYWORDS.containsKey(tokenValue)) {
-              tokens.add(new Token(KEYWORDS.get(tokenValue), tokenValue));
+            if (Keywords.KEYWORDS.containsKey(tokenValue)) {
+              tokens.add(new Token(Keywords.KEYWORDS.get(tokenValue), tokenValue));
             } else {
               tokens.add(new Token(TokenType.IDENTIFIER, tokenValue));
             }

@@ -7,6 +7,7 @@ import org.exception.LexerException;
 import org.exception.UnknownCharacterException;
 
 public class TokenizerState {
+
   public static enum StateType {
     START,
 
@@ -33,6 +34,19 @@ public class TokenizerState {
     DIGIT_END,
   }
 
+  private static final List<StateType> END_STATES = List.of(StateType.COMMENT_END, StateType.ARITHMETIC_OPERATOR_END,
+      StateType.DIGIT_END, StateType.ALPHABETIC_END, StateType.OPEN_PARENTHESIS_END, StateType.CLOSE_PARENTHESIS_END,
+      StateType.SYMBOL_END);
+  private static final List<Character> SKIPPABLE_SYMBOLS = List.of(' ', '\n', '\t');
+
+  private static boolean isSkippable(char c) {
+    return SKIPPABLE_SYMBOLS.contains(c);
+  }
+
+  public boolean isEndState() {
+    return END_STATES.contains(this.type);
+  }
+
   private final StateType type;
 
   public StateType getType() {
@@ -43,24 +57,11 @@ public class TokenizerState {
     this.type = type;
   }
 
-  private static final List<Character> SKIPPABLE_SYMBOLS = List.of(' ', '\n', '\t');
-
-  private static boolean isSkippable(char c) {
-    return SKIPPABLE_SYMBOLS.contains(c);
-  }
-
-  public boolean isEndState() {
-    return this.type == StateType.ARITHMETIC_OPERATOR_END || this.type == StateType.OPEN_PARENTHESIS_END
-        || this.type == StateType.CLOSE_PARENTHESIS_END || this.type == StateType.DIGIT_END
-        || this.type == StateType.ALPHABETIC_END || this.type == StateType.COMMENT_END;
-  }
-
   public static TokenizerState transition(TokenizerState state, char c) throws LexerException {
 
     switch (state.type) {
 
       case START:
-
         if (Character.isDigit(c)) {
           return new TokenizerState(StateType.DIGIT_WHOLE);
         } else if (Character.isAlphabetic(c)) {
