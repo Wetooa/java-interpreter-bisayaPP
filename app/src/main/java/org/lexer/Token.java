@@ -8,19 +8,19 @@ class Token {
     CONDITIONAL_BLOCK,
 
     VARIABLE_DECLARATION,
+    IDENTIFIER,
 
     INPUT_STATEMENTS,
     OUTPUT_STATEMENTS,
 
     FOR_LOOP,
 
-    IDENTIFIER,
-
     EQUALS,
+
     OPEN_PARENTHESIS,
     CLOSE_PARENTHESIS,
 
-    NUMBER,
+    ESCAPED_CHAR,
 
     LOGICAL_OPERATOR,
     ARITHMETIC_OPERATOR,
@@ -28,9 +28,13 @@ class Token {
 
     BOOLEAN_VALUE,
 
-    SYMBOL,
+    AMPERSAND,
+    COMMA,
+    CARRIAGE_RETURN,
+    COLON,
 
     STRING,
+    NUMBER,
 
     DATATYPE
   }
@@ -53,7 +57,7 @@ class Token {
 
   @Override
   public String toString() {
-    return "Token [type=" + type + ", value=" + value + "]";
+    return "Token [type=" + type + ", value=\"" + value + "\"]";
   }
 
 }
