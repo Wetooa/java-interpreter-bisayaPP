@@ -13,6 +13,9 @@ public class TokenizerState {
   public static enum StateType {
     START,
 
+    NEWLINE,
+    NEWLINE_END,
+
     SKIPPABLE,
     SKIPPABLE_END,
 
@@ -69,7 +72,8 @@ public class TokenizerState {
     DIGIT_END,
   }
 
-  private static final Set<StateType> END_STATES = EnumSet.of(StateType.SKIPPABLE_END, StateType.COMMENT_END,
+  private static final Set<StateType> END_STATES = EnumSet.of(StateType.SKIPPABLE_END, StateType.NEWLINE_END,
+      StateType.COMMENT_END,
       StateType.ARITHMETIC_OPERATOR_END, StateType.ASSIGNMENT_OPERATOR_END, StateType.DIGIT_END,
       StateType.ALPHABETIC_END, StateType.AMPERSAND_END, StateType.COMMA_END, StateType.SINGLE_QUOTE_END,
       StateType.DOUBLE_QUOTE_END,
@@ -79,7 +83,7 @@ public class TokenizerState {
       StateType.CLOSE_PARENTHESIS_END,
       StateType.ESCAPED_CHAR_END);
 
-  private static final List<Character> SKIPPABLE_SYMBOLS = List.of(' ', '\n', '\t');
+  private static final List<Character> SKIPPABLE_SYMBOLS = List.of(' ', '\t');
 
   private static boolean isSkippable(char c) {
     return SKIPPABLE_SYMBOLS.contains(c);
@@ -116,6 +120,8 @@ public class TokenizerState {
           return new TokenizerState(StateType.DIGIT_WHOLE);
         } else if (Character.isAlphabetic(c) || c == '_') {
           return new TokenizerState(StateType.ALPHABETIC);
+        } else if (c == '\n') {
+          return new TokenizerState(StateType.NEWLINE);
         } else if (c == '-') {
           return new TokenizerState(StateType.COMMENT);
         } else if (c == '+' || c == '*' || c == '/' || c == '%' || c == '=') {
@@ -150,6 +156,9 @@ public class TokenizerState {
 
       case SKIPPABLE:
         return new TokenizerState(StateType.SKIPPABLE_END);
+
+      case NEWLINE:
+        return new TokenizerState(StateType.NEWLINE_END);
 
       case COMMENT:
         if (c == '-') {

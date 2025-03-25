@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.exception.LexerException;
 import org.lexer.Token.TokenType;
-import org.lexer.TokenizerState.StateType;
 
 public class Lexer {
 
@@ -105,6 +104,10 @@ public class Lexer {
             } else {
               tokens.add(new Token(TokenType.IDENTIFIER, tokenValue));
             }
+            break;
+
+          case NEWLINE_END:
+            tokens.add(new Token(TokenType.NEWLINE, tokenValue));
             break;
 
           default:

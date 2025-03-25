@@ -7,6 +7,8 @@ class Token {
     END_BLOCK,
     CONDITIONAL_BLOCK,
 
+    NEWLINE,
+
     VARIABLE_DECLARATION,
     IDENTIFIER,
 
